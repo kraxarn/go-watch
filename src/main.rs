@@ -21,15 +21,16 @@ async fn index() -> Result<HttpResponse> {
 	Ok(HttpResponse::Ok().body(IndexTemplate{
 		avatars: avatars::avatars()
 			.iter()
-			.map(|a| (a.0, format!("{}{}", &a.1[0..1].to_uppercase(), &a.1[1..]))).collect()
+			.map(|a| (a.0, format!("{}{}", &a.1[0..1].to_uppercase(), &a.1[1..])))
+			.collect()
 	}.render().unwrap()))
 }
 
 async fn favicon() -> Result<NamedFile> {
 	let r: u8 = rand::thread_rng().gen();
-	let file_name = format!("static/img/{}.svg", if r < 5 {
+	let file_name = format!("static/img/{}.svg", if r < 2 {
 		"1f3f3-fe0f-200d-26a7-fe0f"
-	} else if r < 10 {
+	} else if r < 5 {
 		"1f3f3-fe0f-200d-1f308"
 	} else {
 		"1f39e"
