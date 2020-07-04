@@ -3,12 +3,13 @@ watch online videos together, while keeping your privacy
 
 **currently in very early development, not ready for use just yet**
 
-## (Planned) features:
-* Fast and lightweight.
-* No account needed.
-* Automatic blocking of ads and sponsors.
-* Privacy friendly, no YouTube API.
+## (planned) features:
+* fast and lightweight.
+* no account needed.
+* automatic blocking of ads and sponsors.
+* privacy friendly, no youtube api.
 
-## Thanks
-[Invidious](https://github.com/omarroth/invidious) for a privacy friendly YouTube API.
-[SponsorBlock](https://github.com/ajayyy/SponsorBlock) for blocking sponsors.
+## thanks
+[invidious](https://github.com/omarroth/invidious) for a privacy friendly youtube api.
+
+[sponsor block](https://github.com/ajayyy/SponsorBlock) for blocking sponsors.
