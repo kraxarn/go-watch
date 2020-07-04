@@ -20,7 +20,7 @@ id("saveName").onclick = () => {
     const username = id("username")
 	username.style.display = "block"
 	id("nameEntry").style.display = "none"
-	username.textContent = nameInput.value
+	username.textContent = id("nameInput").value
 	setName()
 }
 
