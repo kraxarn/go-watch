@@ -40,11 +40,13 @@ id("saveRoom").onclick = () => {
 }
 
 // Update avatar image
-const setAvatar = (name) => {
+const setAvatar = name => {
 	id("avatar").src = `img/avatar/${name}.png`
 	id("avatarSelect").style.display = "none"
 
-	updateUserInfo(`avatar=${name}`)
+	updateUserInfo({
+		avatar: name
+	})
 }
 
 // Update name
@@ -53,11 +55,16 @@ const setName = () => {
 	if (nameInput.value.length < 3) {
 		return
 	}
-	updateUserInfo(`name=${nameInput.value}`)
+	updateUserInfo({
+		name: nameInput.value
+	})
 }
 
-const updateUserInfo = (values) =>
-	fetch(`/api/setUserInfo?${values}`)
+const updateUserInfo = body =>
+	fetch("/api/set_user_info", {
+		method: "POST",
+		body: JSON.stringify(body)
+	})
 		.then(response => response.json())
 		.then(json => {
 			if (json.error) {
@@ -66,3 +73,4 @@ const updateUserInfo = (values) =>
 				console.log("Update successful")
 			}
 		})
+		.catch(err => console.log(err))
