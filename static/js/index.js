@@ -41,7 +41,7 @@ id("saveRoom").onclick = () => {
 
 // Update avatar image
 const setAvatar = name => {
-	id("avatar").src = `img/avatar/${name}.png`
+	id("avatar").src = `img/${name}.svg`
 	id("avatarSelect").style.display = "none"
 
 	updateUserInfo({
@@ -63,6 +63,9 @@ const setName = () => {
 const updateUserInfo = body =>
 	fetch("/api/set_user_info", {
 		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
 		body: JSON.stringify(body)
 	})
 		.then(response => response.json())

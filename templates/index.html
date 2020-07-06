@@ -13,7 +13,7 @@
         <img id="avatar" src="{{ current_user.avatar_path() }}">
         <div id="avatarSelect">
             {% for (id, name) in avatars %}
-            <div id="avatarOption" onclick="setAvatar('@image')">
+            <div id="avatarOption" onclick="setAvatar('{{ id }}')">
                 <img src="img/{{ id }}.svg" alt="{{ name }}">
                 {{ name }}
             </div>
@@ -21,12 +21,12 @@
         </div>
         <span id="username" title="{{ current_user.id_as_str() }}">{{ current_user.name }}</span>
         <div id="nameEntry">
-            <input id="nameInput" type="text" value="@Model.Name">
+            <input id="nameInput" type="text" value="{{ current_user.name }}">
             <div id="saveName" class="button">Save</div>
         </div>
     </div>
     <ul id="panel">
-        <li id="createRoom" class="button"> Create New Room  </li>
+        <li id="createRoom" class="button">Create New Room </li>
         <li id="roomEntry">
             <input id="roomInput" type="text" placeholder="Room Name">
             <div id="saveRoom" class="button">Save</div>

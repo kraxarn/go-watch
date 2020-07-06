@@ -3,17 +3,20 @@ extern crate actix_rt;
 #[macro_use]
 extern crate lazy_static;
 
+mod api;
 mod avatars;
 mod config;
 mod data;
 
+use actix_files::{Files, NamedFile};
+use actix_identity::{IdentityService, CookieIdentityPolicy, Identity};
+use actix_web::middleware::Logger;
 use actix_web::{HttpResponse, HttpServer, App, Result, web};
 use askama::Template;
-use actix_files::{Files, NamedFile};
-use rand::Rng;
 use env_logger::Env;
-use actix_web::middleware::Logger;
-use actix_identity::{IdentityService, CookieIdentityPolicy, Identity};
+use rand::Rng;
+use serde::Serialize;
+use serde_json::Value;
 
 #[derive(Template)]
 #[template(path = "index.html")]
@@ -22,16 +25,28 @@ struct IndexTemplate<'a> {
 	current_user: &'a data::User
 }
 
-async fn index(identity: Identity) -> Result<HttpResponse> {
+#[derive(Serialize)]
+struct JsonResponse<'a> {
+	error: Option<&'a str>,
+	item: Value
+}
 
-	let user = match identity.identity() {
+fn get_user(identity: &Identity) -> Option<data::User> {
+	match identity.identity() {
 		Some(id) => match serde_json::from_str(&id) {
-			Ok(user) => user,
-			Err(_) => data::User::new()
+			Ok(user) => Some(user),
+			Err(_) => None
 		},
+		None => None
+	}
+}
+
+async fn index(identity: Identity) -> Result<HttpResponse> {
+	let user = match get_user(&identity) {
+		Some(user) => user,
 		None => data::User::new()
 	};
-	identity.remember(serde_json::to_string(&user)?);
+	identity.remember(user.json()?);
 
 	Ok(HttpResponse::Ok().body(IndexTemplate{
 		avatars: avatars::AVATAR_VALUES
@@ -67,6 +82,7 @@ async fn main() -> std::io::Result<()> {
 			))
 			.wrap(Logger::new("%r (%s in %D ms)"))
 			.route("/favicon.ico", web::get().to(favicon))
+			.service(web::resource("/api/set_user_info").route(web::post().to(api::set_user_info)))
 			.service(web::resource("/").route(web::get().to(index)))
 			.service(Files::new("/", "static"))
 	}).bind("localhost:5000")?.run().await

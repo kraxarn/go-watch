@@ -30,4 +30,8 @@ impl User {
 	pub fn avatar_path(&self) -> String {
 		format!("/img/{:x}.svg", self.avatar)
 	}
+
+	pub fn json(&self) -> Result<String, serde_json::Error> {
+		serde_json::to_string(self)
+	}
 }
