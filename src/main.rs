@@ -4,6 +4,7 @@ extern crate actix_rt;
 extern crate lazy_static;
 
 mod avatars;
+mod config;
 mod data;
 
 use actix_web::{HttpResponse, HttpServer, App, Result, web};
@@ -12,9 +13,7 @@ use actix_files::{Files, NamedFile};
 use rand::Rng;
 use env_logger::Env;
 use actix_web::middleware::Logger;
-use std::sync::Mutex;
 use actix_identity::{IdentityService, CookieIdentityPolicy, Identity};
-use std::str::FromStr;
 
 #[derive(Template)]
 #[template(path = "index.html")]
@@ -23,24 +22,23 @@ struct IndexTemplate<'a> {
 	current_user: &'a data::User
 }
 
-async fn index(app_db: web::Data<Mutex<data::AppDb>>, identity: Identity) -> Result<HttpResponse> {
-	let mut db = app_db.lock().unwrap();
+async fn index(identity: Identity) -> Result<HttpResponse> {
 
-	let user = match match identity.identity() {
-		Some(id) => u64::from_str(&id).unwrap_or_else(|_| 0),
-		None => 0
-	} {
-		0 => db.new_user(),
-		id => db.get_user(id)
+	let user = match identity.identity() {
+		Some(id) => match serde_json::from_str(&id) {
+			Ok(user) => user,
+			Err(_) => data::User::new()
+		},
+		None => data::User::new()
 	};
-	identity.remember(format!("{}", &user.id));
+	identity.remember(serde_json::to_string(&user)?);
 
 	Ok(HttpResponse::Ok().body(IndexTemplate{
 		avatars: avatars::AVATAR_VALUES
 			.iter()
 			.map(|a| (format!("{:x}", a.0), format!("{}{}", &a.1[0..1].to_uppercase(), &a.1[1..])))
 			.collect(),
-		current_user: user
+		current_user: &user
 	}.render().unwrap()))
 }
 
@@ -58,7 +56,6 @@ async fn favicon() -> Result<NamedFile> {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-	let db = web::Data::new(Mutex::new(data::AppDb::new()));
 	let private_key: [u8; 32] = rand::thread_rng().gen();
 	env_logger::from_env(Env::default().default_filter_or("info")).init();
 	HttpServer::new(move || {
@@ -68,7 +65,6 @@ async fn main() -> std::io::Result<()> {
 					.name("identity")
 					.secure(false)
 			))
-			.app_data(db.clone())
 			.wrap(Logger::new("%r (%s in %D ms)"))
 			.route("/favicon.ico", web::get().to(favicon))
 			.service(web::resource("/").route(web::get().to(index)))
