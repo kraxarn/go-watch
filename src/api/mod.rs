@@ -36,3 +36,10 @@ pub async fn set_user_info(identity: Identity, user_info: web::Json<UserInfo>) -
 		}
 	})
 }
+
+pub async fn log_out(identity: Identity) -> HttpResponse {
+	identity.forget();
+	HttpResponse::Ok().body(
+		"You can now close this page. \
+		Revisiting the home page will create a new account")
+}

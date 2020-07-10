@@ -128,6 +128,7 @@ async fn main() -> std::io::Result<()> {
 			.wrap(Logger::new("%r (%s in %D ms)"))
 			.route("/favicon.ico", web::get().to(favicon))
 			.service(web::resource("/api/set_user_info").route(web::post().to(api::set_user_info)))
+			.service(web::resource("/api/log_out").route(web::get().to(api::log_out)))
 			.service(web::resource("/").route(web::get().to(index)))
 			.service(Files::new("/", "static"))
 	}).bind("localhost:5000")?.run().await
