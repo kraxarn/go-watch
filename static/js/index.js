@@ -61,7 +61,7 @@ const setName = () => {
 }
 
 const updateUserInfo = body =>
-	fetch("/api/set_user_info", {
+	fetch("/api/user/set_info", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json"

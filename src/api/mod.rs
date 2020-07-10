@@ -1,45 +1,21 @@
-use actix_identity::Identity;
-use actix_web::{web, HttpResponse};
-use serde::Deserialize;
 use serde_json::Value;
-use super::JsonResponse;
+use serde::Serialize;
+use actix_identity::Identity;
 
-#[derive(Deserialize)]
-pub struct UserInfo {
-	pub avatar: Option<String>,
-	pub name: Option<String>
+pub mod user;
+
+#[derive(Serialize)]
+struct JsonResponse<'a> {
+	error: Option<&'a str>,
+	item: Value
 }
 
-pub async fn set_user_info(identity: Identity, user_info: web::Json<UserInfo>) -> HttpResponse {
-	HttpResponse::Ok().json(match super::get_user(&identity) {
-		Some(mut user) => {
-			if let Some(avatar) = &user_info.avatar {
-				if let Ok(avatar_id) = u32::from_str_radix(avatar, 16) {
-					user.avatar = avatar_id;
-				}
-			}
-			if let Some(name) = &user_info.name {
-				user.name = name.clone();
-			}
-			if let Ok(user_json) = user.json() {
-				identity.remember(user_json);
-			}
-
-			JsonResponse {
-				error: None,
-				item: Value::Null
-			}
-		}
-		None => JsonResponse {
-			error: Some("user not found"),
-			item: Value::Null
-		}
-	})
-}
-
-pub async fn log_out(identity: Identity) -> HttpResponse {
-	identity.forget();
-	HttpResponse::Ok().body(
-		"You can now close this page. \
-		Revisiting the home page will create a new account")
+pub fn get_user(identity: &Identity) -> Option<super::data::User> {
+	match identity.identity() {
+		Some(id) => match serde_json::from_str(&id) {
+			Ok(user) => Some(user),
+			Err(_) => None
+		},
+		None => None
+	}
 }

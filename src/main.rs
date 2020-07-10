@@ -16,7 +16,6 @@ use askama::Template;
 use env_logger::Env;
 use rand::Rng;
 use serde::{Serialize, Deserialize};
-use serde_json::Value;
 use std::path::PathBuf;
 use std::fs::File;
 use std::io::{Read, Write};
@@ -41,24 +40,8 @@ struct IndexTemplate<'a> {
 	current_user: &'a data::User
 }
 
-#[derive(Serialize)]
-struct JsonResponse<'a> {
-	error: Option<&'a str>,
-	item: Value
-}
-
-fn get_user(identity: &Identity) -> Option<data::User> {
-	match identity.identity() {
-		Some(id) => match serde_json::from_str(&id) {
-			Ok(user) => Some(user),
-			Err(_) => None
-		},
-		None => None
-	}
-}
-
 async fn index(identity: Identity) -> Result<HttpResponse> {
-	let user = match get_user(&identity) {
+	let user = match api::get_user(&identity) {
 		Some(user) => user,
 		None => data::User::new()
 	};
@@ -127,8 +110,8 @@ async fn main() -> std::io::Result<()> {
 			))
 			.wrap(Logger::new("%r (%s in %D ms)"))
 			.route("/favicon.ico", web::get().to(favicon))
-			.service(web::resource("/api/set_user_info").route(web::post().to(api::set_user_info)))
-			.service(web::resource("/api/log_out").route(web::get().to(api::log_out)))
+			.service(web::resource("/api/user/set_info").route(web::post().to(api::user::set_user_info)))
+			.service(web::resource("/api/user/log_out").route(web::get().to(api::user::log_out)))
 			.service(web::resource("/").route(web::get().to(index)))
 			.service(Files::new("/", "static"))
 	}).bind("localhost:5000")?.run().await
