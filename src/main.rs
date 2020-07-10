@@ -15,8 +15,24 @@ use actix_web::{HttpResponse, HttpServer, App, Result, web};
 use askama::Template;
 use env_logger::Env;
 use rand::Rng;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use serde_json::Value;
+use std::path::{PathBuf, Path};
+use std::fs::File;
+use std::io::{Read, Write};
+
+#[derive(Serialize, Deserialize)]
+struct Config {
+	identity_key: [u8; 32]
+}
+
+impl Config {
+	fn new() -> Self {
+		Self {
+			identity_key: rand::thread_rng().gen()
+		}
+	}
+}
 
 #[derive(Template)]
 #[template(path = "index.html")]
@@ -71,13 +87,42 @@ async fn favicon() -> Result<NamedFile> {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-	let private_key: [u8; 32] = rand::thread_rng().gen();
+
+	let config_path = match dirs::config_dir() {
+		Some(path) => path,
+		None => PathBuf::new()
+	}.join("watch-rs");
+	std::fs::create_dir_all(&config_path);
+
+	let config_file_path = config_path.join("config.json");
+	let mut config_file = match File::open(&config_file_path) {
+		Ok(file) => file,
+		Err(_) => File::create(&config_file_path)?
+	};
+	let mut config_str = String::new();
+	config_file.read_to_string(&mut config_str);
+
+	let config = match serde_json::from_str::<Config>(&config_str) {
+		Ok(cfg) => cfg,
+		Err(_) => {
+			let cfg = Config::new();
+			config_file.write_all(serde_json::to_string(&cfg)?.as_bytes());
+			cfg
+		}
+	};
+
+	let id_key = config.identity_key;
 	env_logger::from_env(Env::default().default_filter_or("info")).init();
+	println!("using key: {}", id_key
+		.iter().map(|k| format!("{:x}", k))
+		.collect::<String>());
+
 	HttpServer::new(move || {
 		App::new()
 			.wrap(IdentityService::new(
-				CookieIdentityPolicy::new(&private_key)
+				CookieIdentityPolicy::new(&id_key)
 					.name("identity")
+					.max_age_time(chrono::Duration::days(30))
 					.secure(false)
 			))
 			.wrap(Logger::new("%r (%s in %D ms)"))
