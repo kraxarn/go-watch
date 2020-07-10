@@ -17,7 +17,7 @@ use env_logger::Env;
 use rand::Rng;
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
-use std::path::{PathBuf, Path};
+use std::path::PathBuf;
 use std::fs::File;
 use std::io::{Read, Write};
 
@@ -92,7 +92,7 @@ async fn main() -> std::io::Result<()> {
 		Some(path) => path,
 		None => PathBuf::new()
 	}.join("watch-rs");
-	std::fs::create_dir_all(&config_path);
+	std::fs::create_dir_all(&config_path)?;
 
 	let config_file_path = config_path.join("config.json");
 	let mut config_file = match File::open(&config_file_path) {
@@ -100,13 +100,13 @@ async fn main() -> std::io::Result<()> {
 		Err(_) => File::create(&config_file_path)?
 	};
 	let mut config_str = String::new();
-	config_file.read_to_string(&mut config_str);
+	config_file.read_to_string(&mut config_str)?;
 
 	let config = match serde_json::from_str::<Config>(&config_str) {
 		Ok(cfg) => cfg,
 		Err(_) => {
 			let cfg = Config::new();
-			config_file.write_all(serde_json::to_string(&cfg)?.as_bytes());
+			config_file.write_all(serde_json::to_string(&cfg)?.as_bytes())?;
 			cfg
 		}
 	};
