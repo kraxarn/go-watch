@@ -31,8 +31,8 @@ ul {
 #profile img {
 	margin-right: 16px;
 	cursor: pointer;
-	max-width: 32px;
-	max-height: 32px;
+	width: 32px;
+	height: 32px;
 }
 
 #profile span {
