@@ -31,6 +31,10 @@ impl User {
 		format!("/img/{:x}.svg", self.avatar)
 	}
 
+	pub fn avatar_name(&self) -> String {
+		super::avatars::AVATAR_MAP[&self.avatar].to_string()
+	}
+
 	pub fn json(&self) -> Result<String, serde_json::Error> {
 		serde_json::to_string(self)
 	}

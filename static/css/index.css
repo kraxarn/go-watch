@@ -68,7 +68,7 @@ ul {
 	display: none;
 }
 
-#avatarOption {
+.avatarOption {
 	width: 128px;
 	text-align: start;
 	display: flex;
@@ -78,11 +78,11 @@ ul {
 	cursor: pointer;
 }
 
-#avatarOption:hover {
+.avatarOption:hover {
 	background-color: rgba(60, 60, 60, 0.8);
 }
 
-#avatarOption img {
+.avatarOption img {
 	width: 24px;
 	height: 24px;
 }

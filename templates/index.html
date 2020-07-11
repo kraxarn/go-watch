@@ -1,8 +1,10 @@
+<!doctype html>
 <html lang="en">
 <head>
     <title>watch-rs</title>
     <link rel="stylesheet" type="text/css" href="/css/main.css">
     <link rel="stylesheet" type="text/css" href="/css/index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
@@ -10,10 +12,10 @@
 <div id="container">
     <h1>Welcome to watch-rs!</h1>
     <div id="profile">
-        <img id="avatar" src="{{ current_user.avatar_path() }}">
+        <img id="avatar" src="{{ current_user.avatar_path() }}" alt="{{ current_user.avatar_name() }}">
         <div id="avatarSelect">
             {% for (id, name) in avatars %}
-            <div id="avatarOption" onclick="setAvatar('{{ id }}')">
+            <div class="avatarOption" onclick="setAvatar('{{ id }}')">
                 <img src="img/{{ id }}.svg" alt="{{ name }}">
                 {{ name }}
             </div>
