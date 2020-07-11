@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<title>watch-rs</title>
+	<title>{{ name }}</title>
 	<link rel="stylesheet" type="text/css" href="/css/main.css">
 	<link rel="stylesheet" type="text/css" href="/css/room.css">
 	<meta charset="UTF-8">
@@ -19,7 +19,7 @@
 	</div>
 	<div id="videoControls" class="dropShadow">
 		<div id="roomTitle">
-			@ViewData["RoomId"] - Video Name
+			{{ name }} - Video Name
 		</div>
 		<div id="videoSize" onclick="toggleVideoSize()">
 			Size: <span id="videoSizeString">540</span>p

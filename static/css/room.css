@@ -92,6 +92,9 @@
 .comment {
 	min-width: 16px;
 	padding-bottom: 4px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 }
 
 .comment img {

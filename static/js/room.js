@@ -118,11 +118,14 @@ function setVideoSize(width, height)
 
 function addComment(type, message)
 {
+	const icon = type === "status"
+		? "1f4e2" : "1f4ac"
+
 	const comment = document.createElement("div")
 	comment.className = "comment"
 
 	const img = document.createElement("img")
-	img.src = `/img/icon/${type}.png`
+	img.src = `/img//${icon}.svg`
 	comment.appendChild(img)
 
 	const msg = document.createElement("span")
@@ -185,56 +188,32 @@ function getQueuedItems()
 }
 
 
-const name = "@Model.Name"
-const roomId = "@ViewData[RoomId]"
-
 const entry = id("commentEntry")
+
+const send = data => socket.send(JSON.stringify(data))
 
 entry.addEventListener("keypress", event =>
 {
 	if (event.key === "Enter") {
 		if (entry.value.length > 0 && entry.value.length < 256) {
-			socket.emit("message", entry.value)
+			send({
+				type: "message",
+				value: entry.value
+			})
 		}
 		entry.value = null
 	}
 })
 
-const socket = new WebSocket("/ws")
+const socket = new WebSocket(`ws://${location.host}/chat`)
 
-socket.on("connect", () =>
-{
-	socket.emit("join",
-		{
-			name: name,
-			room: roomId
-		})
-})
+socket.onopen = event => {
+	addComment("status", "Connected")
+}
 
-socket.on("enter", data =>
-{
-	addComment("status", `${data.name === name ? "You" : data.name} joined`)
-})
-
-socket.on("leave", data =>
-{
-	addComment("status", `${data.name} left`)
-})
-
-socket.on("message", data =>
-{
-	addComment("message", `${data.name === name ? "You" : data.name}: ${data.message}`)
-	const commentsContainer = id("commentsContainer")
-	commentsContainer.scrollTop = commentsContainer.scrollHeight
-})
-
-socket.on("video", data =>
-{
-	console.log(data)
-	if (data.type === "add") {
-		addQueueItem(`https://i.ytimg.com/vi/${data.id}/mqdefault.jpg`, data.title, data.id)
-	}
-})
+socket.onmessage = event => {
+	addComment("message", event.data)
+}
 
 function addVideo(id, title) {
 	socket.emit("video",

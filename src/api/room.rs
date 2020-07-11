@@ -75,8 +75,9 @@ pub async fn handle(request: HttpRequest, stream: web::Payload, identity: Identi
 	response
 }
 
-pub async fn room() -> Result<HttpResponse, Error> {
+pub async fn room(request: HttpRequest) -> Result<HttpResponse, Error> {
+	let name = request.match_info().get("name").unwrap();
 	Ok(HttpResponse::Ok().body(RoomTemplate{
-		name: "room_name".to_string()
+		name: name.to_string()
 	}.render().unwrap()))
 }
