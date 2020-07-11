@@ -4,10 +4,17 @@ use actix_web::{HttpRequest, web, HttpResponse, Error};
 use actix_web_actors::ws;
 use actix_web_actors::ws::{Message, ProtocolError};
 use actix_identity::Identity;
+use askama::Template;
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
+
+#[derive(Template)]
+#[template(path = "room.html")]
+pub struct RoomTemplate {
+	pub name: String
+}
 
 struct Session {
 	//id: usize,
@@ -66,4 +73,10 @@ pub async fn handle(request: HttpRequest, stream: web::Payload, identity: Identi
 	let response = ws::start(Session::new(), &request, stream);
 	println!("response: {:?}", &response);
 	response
+}
+
+pub async fn room() -> Result<HttpResponse, Error> {
+	Ok(HttpResponse::Ok().body(RoomTemplate{
+		name: "room_name".to_string()
+	}.render().unwrap()))
 }

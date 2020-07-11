@@ -111,11 +111,15 @@ async fn main() -> std::io::Result<()> {
 					.secure(false)
 			))
 			.wrap(Logger::new("[%s, %D ms] %r"))
-			.route("/favicon.ico", web::get().to(favicon))
+			// api::user
 			.service(web::resource("/api/user/set_info").route(web::post().to(api::user::set_user_info)))
 			.service(web::resource("/api/user/log_out").route(web::get().to(api::user::log_out)))
-			.service(web::resource("/").route(web::get().to(index)))
+			// api::room
+			.service(web::resource("/room/{name}").route(web::get().to(api::room::room)))
 			.service(web::resource("/chat/").route(web::get().to(api::room::handle)))
+			// other
+			.route("/favicon.ico", web::get().to(favicon))
+			.service(web::resource("/").route(web::get().to(index)))
 			.service(Files::new("/", "static"))
 	}).bind("localhost:5000")?.run().await
 }

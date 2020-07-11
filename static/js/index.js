@@ -1,5 +1,3 @@
-const id = (elementId) => document.getElementById(elementId)
-
 // Open avatar selection
 id("avatar").onclick = () => {
     const avatarSelect = id("avatarSelect")
