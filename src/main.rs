@@ -103,6 +103,7 @@ async fn main() -> std::io::Result<()> {
 
 	HttpServer::new(move || {
 		App::new()
+			.data(api::room::ChatServer::new())
 			.wrap(IdentityService::new(
 				CookieIdentityPolicy::new(&id_key)
 					.name("identity")

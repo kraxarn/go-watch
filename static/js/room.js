@@ -119,7 +119,9 @@ function setVideoSize(width, height)
 function addComment(type, message)
 {
 	const icon = type === "status"
-		? "1f4e2" : "1f4ac"
+		? "1f4e2" : type === "error"
+			? "274c" : type === "message"
+				? "1f4ac" : type
 
 	const comment = document.createElement("div")
 	comment.className = "comment"
@@ -196,10 +198,7 @@ entry.addEventListener("keypress", event =>
 {
 	if (event.key === "Enter") {
 		if (entry.value.length > 0 && entry.value.length < 256) {
-			send({
-				type: "message",
-				value: entry.value
-			})
+			socket.send(entry.value)
 		}
 		entry.value = null
 	}
@@ -207,12 +206,24 @@ entry.addEventListener("keypress", event =>
 
 const socket = new WebSocket(`ws://${location.host}/chat`)
 
-socket.onopen = event => {
+socket.onopen = () => {
 	addComment("status", "Connected")
+	id("commentEntry").disabled = false
 }
 
 socket.onmessage = event => {
-	addComment("message", event.data)
+	const data = JSON.parse(event.data)
+	addComment(data.avatar_url ? data.avatar_url : data.type, data.value)
+}
+
+socket.onerror = event => {
+	console.log(event)
+	addComment("error", "Something went wrong")
+}
+
+socket.onclose = () => {
+	addComment("status", "Disconnected")
+	id("commentEntry").disabled = true
 }
 
 function addVideo(id, title) {
