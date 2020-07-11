@@ -115,6 +115,7 @@ async fn main() -> std::io::Result<()> {
 			.service(web::resource("/api/user/set_info").route(web::post().to(api::user::set_user_info)))
 			.service(web::resource("/api/user/log_out").route(web::get().to(api::user::log_out)))
 			.service(web::resource("/").route(web::get().to(index)))
+			.service(web::resource("/chat/").route(web::get().to(api::room::handle)))
 			.service(Files::new("/", "static"))
 	}).bind("localhost:5000")?.run().await
 }

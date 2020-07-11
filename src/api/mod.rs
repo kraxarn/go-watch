@@ -3,6 +3,7 @@ use serde::Serialize;
 use actix_identity::Identity;
 
 pub mod user;
+pub mod room;
 
 #[derive(Serialize)]
 struct JsonResponse<'a> {
