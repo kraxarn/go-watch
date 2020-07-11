@@ -91,7 +91,7 @@
 
 .comment {
 	min-width: 16px;
-	padding-bottom: 8px;
+	padding-bottom: 4px;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -100,7 +100,6 @@
 .comment img {
 	margin-right: 8px;
 	width: 16px;
-	height: 16px;
 }
 
 .comment span {
