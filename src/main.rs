@@ -110,7 +110,7 @@ async fn main() -> std::io::Result<()> {
 					.same_site(SameSite::Strict)
 					.secure(false)
 			))
-			.wrap(Logger::new("%r (%s in %D ms)"))
+			.wrap(Logger::new("[%s, %D ms] %r"))
 			.route("/favicon.ico", web::get().to(favicon))
 			.service(web::resource("/api/user/set_info").route(web::post().to(api::user::set_user_info)))
 			.service(web::resource("/api/user/log_out").route(web::get().to(api::user::log_out)))
