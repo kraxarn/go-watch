@@ -5,6 +5,7 @@ use actix_web_actors::ws;
 use actix_web_actors::ws::{Message, ProtocolError};
 use actix_identity::Identity;
 use askama::Template;
+use serde_json::json;
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 
@@ -17,15 +18,15 @@ pub struct RoomTemplate {
 }
 
 struct Session {
-	//id: usize,
 	heartbeat: Instant,
-	//room_id: String,
+	user: crate::data::User
 }
 
 impl Session {
-	fn new() -> Self {
+	fn new(user: crate::data::User) -> Self {
 		Self {
-			heartbeat: Instant::now()
+			heartbeat: Instant::now(),
+			user
 		}
 	}
 
@@ -40,6 +41,7 @@ impl Session {
 		});
 	}
 }
+
 impl Actor for Session {
 	type Context = ws::WebsocketContext<Self>;
 
@@ -57,8 +59,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
 				context.pong(&msg)
 			},
 			Ok(ws::Message::Pong(_)) => self.heartbeat = Instant::now(),
-			Ok(ws::Message::Text(text)) => context.text(text),
-			Ok(ws::Message::Binary(bin)) => context.binary(bin),
+			Ok(ws::Message::Text(text)) => context.text(json!({
+				"type": "message",
+				"avatar_url": format!("{:x}", &self.user.avatar),
+				"value": format!("{}: {}", &self.user.name, &text)
+			}).to_string()),
 			Ok(ws::Message::Close(reason)) => {
 				context.close(reason);
 				context.stop()
@@ -69,10 +74,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
 }
 
 pub async fn handle(request: HttpRequest, stream: web::Payload, identity: Identity) -> Result<HttpResponse, Error> {
-	println!("request: {:?}, user: {:?}", &request, &super::get_user(&identity).unwrap().name);
-	let response = ws::start(Session::new(), &request, stream);
-	println!("response: {:?}", &response);
-	response
+	ws::start(Session::new(super::get_user(&identity).unwrap()), &request, stream)
 }
 
 pub async fn room(request: HttpRequest) -> Result<HttpResponse, Error> {
