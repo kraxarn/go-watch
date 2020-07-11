@@ -19,6 +19,7 @@ use serde::{Serialize, Deserialize};
 use std::path::PathBuf;
 use std::fs::File;
 use std::io::{Read, Write};
+use actix_web::cookie::SameSite;
 
 #[derive(Serialize, Deserialize)]
 struct Config {
@@ -106,6 +107,7 @@ async fn main() -> std::io::Result<()> {
 				CookieIdentityPolicy::new(&id_key)
 					.name("identity")
 					.max_age_time(chrono::Duration::days(30))
+					.same_site(SameSite::Strict)
 					.secure(false)
 			))
 			.wrap(Logger::new("%r (%s in %D ms)"))
