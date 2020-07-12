@@ -10,9 +10,12 @@ id("videoSearch").addEventListener("input", () =>
 	}
 
 	// Search
+	const videoSearch = id("videoSearch")
+	videoSearch.disabled = true
 	search(query, callback =>
 	{
 		resetSearchResults()
+		videoSearch.disabled = false
 		callback.forEach(item =>
 		{
 			addSearchResult(item.thumbnail, item.title, item.description, item.id)
@@ -45,7 +48,6 @@ function search(query, callback)
 function addSearchResult(thumbnailSrc, titleText, descriptionText, videoId)
 {
 	if (!thumbnailSrc || !titleText || !descriptionText) {
-		console.log("Warning: One or more values missing, not adding result")
 		return
 	}
 
@@ -61,13 +63,13 @@ function addSearchResult(thumbnailSrc, titleText, descriptionText, videoId)
 	// Search info: Thumbnail
 	const thumbnail = document.createElement("img")
 	thumbnail.className = "searchThumbnail"
-	thumbnail.src = thumbnailSrc
+	thumbnail.src = `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
 	searchInfo.appendChild(thumbnail)
 
 	// Search info: Title
 	const title = document.createElement("h5")
 	if (titleText.length > 60) {
-		titleText = titleText.subString(0, 60) + "..."
+		titleText = titleText.substring(0, 60) + "..."
 	}
 	title.textContent = titleText
 	searchInfo.appendChild(title)
@@ -77,24 +79,16 @@ function addSearchResult(thumbnailSrc, titleText, descriptionText, videoId)
 	description.textContent = descriptionText
 	searchInfo.appendChild(description)
 
-	// Add queue container
-	const queue = document.createElement("div")
-	queue.className = "addQueueContainer"
-	queue.onclick = () => addVideo(videoId, titleText)
-	searchResult.appendChild(queue)
-
 	// Add queue container: Img
 	const queueImg = document.createElement("img")
-	queueImg.src = "/img/icon/addQueue.png"
-	queue.appendChild(queueImg)
-
-	// Add queue container: Span
-	const queueTxt = document.createElement("span")
-	queueTxt.textContent = "Add to Queue"
-	queue.appendChild(queueTxt)
+	queueImg.className = "queueImg"
+	queueImg.src = "/img/1f4e5.svg"
+	queueImg.title = "Add to queue"
+	queueImg.onclick = () => addVideo(videoId, titleText)
+	searchResult.appendChild(queueImg)
 
 	// Add result to results
-	searchResults.appendChild(searchResult)
+	id("searchResults").appendChild(searchResult)
 }
 
 function resetSearchResults()
@@ -229,10 +223,5 @@ socket.onclose = () => {
 }
 
 function addVideo(id, title) {
-	socket.emit("video",
-		{
-			type: "add",
-			id: id,
-			title: title
-		})
+	socket.send(`/video ${id}`)
 }

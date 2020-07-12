@@ -124,6 +124,10 @@
 	border: 0;
 }
 
+#commentEntry:disabled, #videoSearch:disabled {
+	color: #cccccc;
+}
+
 #commentEntry {
 	width: 100%;
 	border: 0;
@@ -153,7 +157,7 @@
 
 .searchInfo {
 	height: 100%;
-	flex-grow: 5;
+	width: 100%;
 }
 
 .searchResult .searchThumbnail {
@@ -177,23 +181,19 @@
 	opacity: 0.8;
 }
 
-.addQueueContainer {
+.queueImg {
 	cursor: pointer;
-	opacity: 0.6;
+	opacity: 0.25;
+	filter: grayscale(100%);
 	margin: 0 16px 0 32px;
-	transition: opacity 0.15s ease-in-out;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	text-align: center;
+	transition: opacity 0.25s ease-in-out, filter 0.25s ease-in-out;
+	width: 32px;
+	height: 32px;
 }
 
-.addQueueContainer img {
-	height: 42px;
-}
-
-.addQueueContainer:hover {
+.searchResult:hover .queueImg {
 	opacity: 1;
+	filter: grayscale(0%);
 }
 
 .queueItem {
