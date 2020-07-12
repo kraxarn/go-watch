@@ -117,6 +117,8 @@ async fn main() -> std::io::Result<()> {
 			// api::room
 			.service(web::resource("/room/{name}").route(web::get().to(api::room::room)))
 			.service(web::resource("/chat").route(web::get().to(api::room::handle)))
+			// api::search
+			.service(web::resource("/api/search").route(web::post().to(api::search::search)))
 			// other
 			.route("/favicon.ico", web::get().to(favicon))
 			.service(web::resource("/").route(web::get().to(index)))

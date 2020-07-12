@@ -22,17 +22,22 @@ id("videoSearch").addEventListener("input", () =>
 
 function search(query, callback)
 {
-	fetch(`/api/search/?q=${query}`)
-		.then(response =>
-		{
-			return response.json()
+	fetch("/api/search", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			q: query
 		})
+	})
+		.then(response => response.json())
 		.then(json =>
 		{
 			if (json.error) {
 				callback(null)
 			} else {
-				callback(json.message)
+				callback(json)
 			}
 		})
 }

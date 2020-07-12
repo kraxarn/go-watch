@@ -4,6 +4,7 @@ use actix_identity::Identity;
 
 pub mod user;
 pub mod room;
+pub mod search;
 
 #[derive(Serialize)]
 struct JsonResponse<'a> {
