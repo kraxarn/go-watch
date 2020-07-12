@@ -33,7 +33,6 @@ impl Session {
 	fn heartbeat(&self, context: &mut <Self as Actor>::Context) {
 		context.run_interval(HEARTBEAT_INTERVAL, |actor, context| {
 			if Instant::now().duration_since(actor.heartbeat) >= CLIENT_TIMEOUT {
-				println!("client timed out");
 				context.stop()
 			} else {
 				context.ping(b"")
@@ -52,7 +51,6 @@ impl Actor for Session {
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
 	fn handle(&mut self, message: Result<Message, ProtocolError>, context: &mut Self::Context) {
-		println!("ws: {:?}", &message);
 		match message {
 			Ok(ws::Message::Ping(msg)) => {
 				self.heartbeat = Instant::now();

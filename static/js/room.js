@@ -94,7 +94,7 @@ function addSearchResult(thumbnailSrc, titleText, descriptionText, videoId)
 
 function resetSearchResults()
 {
-	const results = window.searchResults
+	const results = id("searchResults")
 	while (results.firstChild) {
 		results.removeChild(results.firstChild)
 	}
@@ -102,7 +102,7 @@ function resetSearchResults()
 
 function toggleVideoSize()
 {
-	const dropdown = window.videoSizeDropdown
+	const dropdown = id("videoSizeDropdown")
 	const visible = dropdown.style.visibility === "visible"
 
 	dropdown.style.visibility = visible ? "hidden" : "visible"
@@ -110,10 +110,10 @@ function toggleVideoSize()
 
 function setVideoSize(width, height)
 {
-	window.video.style.width  = width + "px"
-	window.video.style.height = height + "px"
+	id("video").style.width  = width + "px"
+	id("video").style.height = height + "px"
 
-	window.videoSizeString.textContent = height
+	id("videoSizeString").textContent = height
 }
 
 function addComment(type, message)
@@ -134,7 +134,7 @@ function addComment(type, message)
 	msg.textContent = message
 	comment.appendChild(msg)
 
-	window.commentsContainer.appendChild(comment)
+	id("commentsContainer").appendChild(comment)
 }
 
 function addTestComments()
@@ -192,8 +192,6 @@ function getQueuedItems()
 
 const entry = id("commentEntry")
 
-const send = data => socket.send(JSON.stringify(data))
-
 entry.addEventListener("keypress", event =>
 {
 	if (event.key === "Enter") {
@@ -213,13 +211,11 @@ socket.onopen = () => {
 
 socket.onmessage = event => {
 	const data = JSON.parse(event.data)
-	console.log(data)
 	addComment(data.avatar_url ? data.avatar_url : data.type, data.value)
 }
 
 socket.onerror = event => {
-	console.log(event)
-	addComment("error", "Something went wrong")
+	addComment("error", "Connection failed")
 }
 
 socket.onclose = () => {
