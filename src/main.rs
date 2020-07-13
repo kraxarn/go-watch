@@ -71,7 +71,6 @@ async fn favicon() -> Result<NamedFile> {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-
 	let config_path = match dirs::config_dir() {
 		Some(path) => path,
 		None => PathBuf::new()

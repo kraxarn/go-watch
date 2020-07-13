@@ -57,11 +57,28 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
 				context.pong(&msg)
 			},
 			Ok(ws::Message::Pong(_)) => self.heartbeat = Instant::now(),
-			Ok(ws::Message::Text(text)) => context.text(json!({
-				"type": "message",
-				"avatar_url": format!("{:x}", &self.user.avatar),
-				"value": format!("{}: {}", &self.user.name, &text)
-			}).to_string()),
+			Ok(ws::Message::Text(text)) => {
+				let msg: Vec<&str> = text.trim().split(' ').collect();
+				context.text(match msg[0] {
+					"/video" => {
+						let info = super::search::video_info(msg[1]).unwrap();
+						json!({
+							"type": "video",
+							"title": info.title,
+							"thumbnail": info.thumbnail,
+							"id": msg[1],
+							"video": info.video_url,
+							"audio": info.audio_url,
+							"description": info.description
+						})
+					},
+					_ => json!({
+						"type": "message",
+						"avatar_url": format!("{:x}", &self.user.avatar),
+						"message": format!("{}: {}", &self.user.name, &text)
+					})
+				}.to_string())
+			},
 			Ok(ws::Message::Close(reason)) => {
 				context.close(reason);
 				context.stop()

@@ -210,7 +210,15 @@ socket.onopen = () => {
 
 socket.onmessage = event => {
 	const data = JSON.parse(event.data)
-	addComment(data.avatar_url ? data.avatar_url : data.type, data.value)
+	switch (data.type) {
+		case "message":
+			addComment(data["avatar_url"], data["message"])
+			break
+
+		case "video":
+			console.log(data)
+			break
+	}
 }
 
 socket.onerror = event => {

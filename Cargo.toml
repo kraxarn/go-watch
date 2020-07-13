@@ -37,7 +37,7 @@ features = ["serde"]
 
 [dependencies.reqwest]
 version = "^0.10"
-features = ["json"]
+features = ["blocking", "json"]
 
 [dependencies.tokio]
 version = "^0.2"
