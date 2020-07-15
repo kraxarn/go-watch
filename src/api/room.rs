@@ -61,16 +61,22 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
 				let msg: Vec<&str> = text.trim().split(' ').collect();
 				context.text(match msg[0] {
 					"/video" => {
-						let info = super::search::video_info(msg[1]).unwrap();
-						json!({
-							"type": "video",
-							"title": info.title,
-							"thumbnail": info.thumbnail,
-							"id": msg[1],
-							"video": info.video_url,
-							"audio": info.audio_url,
-							"description": info.description
-						})
+						if let Ok(info) = futures::executor::block_on(
+							super::search::video_info(msg[1])) {
+							json!({
+								"type": "video",
+								"title": info.title,
+								"thumbnail": info.thumbnail,
+								"id": msg[1],
+								"video": info.video_url,
+								"audio": info.audio_url,
+								"description": info.description
+							})
+						} else {
+							json!({
+								"type": "error"
+							})
+						}
 					},
 					_ => json!({
 						"type": "message",

@@ -2317,6 +2317,7 @@ dependencies = [
  "chrono",
  "dirs",
  "env_logger",
+ "futures",
  "lazy_static",
  "rand",
  "reqwest",
