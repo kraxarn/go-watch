@@ -80,7 +80,7 @@ async fn search_results(query: &str) -> Result<Vec<SearchResult>, reqwest::Error
 		.iter().map(|response| response.into()).collect())
 }
 
-pub async fn video_info(video_id: &str) -> Result<VideoInfo, reqwest::Error> {
+pub async fn video_info(video_id: String) -> Result<VideoInfo, reqwest::Error> {
 	let response: VideoInfoResponse = reqwest::get(
 		&format!("{}/api/v1/videos/{}", crate::config::INVIDIOUS_URL, video_id)).await?
 		.json().await?;

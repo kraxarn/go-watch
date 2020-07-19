@@ -1,5 +1,5 @@
 use std::time::{Instant, Duration};
-use actix::{StreamHandler, Actor, AsyncContext, ActorContext};
+use actix::{StreamHandler, Actor, AsyncContext, ActorContext, WrapFuture, ActorFuture, ContextFutureSpawner};
 use actix_web::{HttpRequest, web, HttpResponse, Error};
 use actix_web_actors::ws;
 use actix_web_actors::ws::{Message, ProtocolError};
@@ -59,31 +59,28 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
 			Ok(ws::Message::Pong(_)) => self.heartbeat = Instant::now(),
 			Ok(ws::Message::Text(text)) => {
 				let msg: Vec<&str> = text.trim().split(' ').collect();
-				context.text(match msg[0] {
+				match msg[0] {
 					"/video" => {
-						if let Ok(info) = futures::executor::block_on(
-							super::search::video_info(msg[1])) {
-							json!({
-								"type": "video",
-								"title": info.title,
-								"thumbnail": info.thumbnail,
-								"id": msg[1],
-								"video": info.video_url,
-								"audio": info.audio_url,
-								"description": info.description
+						super::search::video_info( msg[1].to_owned())
+							.into_actor(self)
+							.then(move |result, _, context| {
+								if let Ok(info) = result {
+									context.text(json!({
+										"type": "video",
+										"title": info.title,
+										"thumbnail": info.thumbnail,
+										"id": "id", //info.id,
+										"video": info.video_url,
+										"audio": info.audio_url,
+										"description": info.description
+									}).to_string());
+								}
+								actix::fut::ready(())
 							})
-						} else {
-							json!({
-								"type": "error"
-							})
-						}
+							.wait(context)
 					},
-					_ => json!({
-						"type": "message",
-						"avatar_url": format!("{:x}", &self.user.avatar),
-						"message": format!("{}: {}", &self.user.name, &text)
-					})
-				}.to_string())
+					_ => ()
+				}
 			},
 			Ok(ws::Message::Close(reason)) => {
 				context.close(reason);
