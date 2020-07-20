@@ -83,7 +83,7 @@ async fn search_results(query: &str) -> Result<Vec<SearchResult>, reqwest::Error
 fn find_best_format(formats: &Vec<(&AdaptiveFormat, i32)>) -> String {
 	match formats
 		.iter()
-		.max_by(|(_, r1), (_, r2)| r2.cmp(r1)) {
+		.max_by(|(_, r1), (_, r2)| r1.cmp(r2)) {
 		Some(f) => f.0.url.clone(),
 		None => String::new()
 	}

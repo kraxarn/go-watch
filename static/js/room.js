@@ -188,8 +188,14 @@ function getQueuedItems()
 	}
 }
 
-
 const entry = id("commentEntry")
+
+const video = document.querySelector("video")
+const audio = document.querySelector("audio")
+
+audio.onplay = () =>
+	video.play().then(_ =>
+		video.currentTime = audio.currentTime)
 
 entry.addEventListener("keypress", event =>
 {
@@ -216,6 +222,9 @@ socket.onmessage = event => {
 			break
 
 		case "video":
+			video.src = data.video
+			audio.src = data.audio
+			audio.play()
 			console.log(data)
 			break
 	}
