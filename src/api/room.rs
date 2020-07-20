@@ -19,14 +19,14 @@ pub struct RoomTemplate {
 
 struct Session {
 	heartbeat: Instant,
-	user: crate::data::User
+	//user: crate::data::User
 }
 
 impl Session {
-	fn new(user: crate::data::User) -> Self {
+	fn new(_user: crate::data::User) -> Self {
 		Self {
 			heartbeat: Instant::now(),
-			user
+			//user
 		}
 	}
 
@@ -64,16 +64,18 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
 						super::search::video_info( msg[1].to_owned())
 							.into_actor(self)
 							.then(move |result, _, context| {
-								if let Ok(info) = result {
-									context.text(json!({
-										"type": "video",
-										"title": info.title,
-										"thumbnail": info.thumbnail,
-										"id": "id", //info.id,
-										"video": info.video_url,
-										"audio": info.audio_url,
-										"description": info.description
-									}).to_string());
+								match result {
+									Ok(info) => {
+										context.text(json!({
+											"type": "video",
+											"title": info.title,
+											"thumbnail": info.thumbnail,
+											"video": info.video_url,
+											"audio": info.audio_url,
+											"description": info.description
+										}).to_string());
+									},
+									Err(err) => println!("error: {}", err)
 								}
 								actix::fut::ready(())
 							})

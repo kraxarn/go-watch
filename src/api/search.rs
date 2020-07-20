@@ -45,7 +45,7 @@ struct AdaptiveFormat {
 	#[serde(alias = "type")]
 	codec: String,
 	url: String,
-	resolution: String,
+	resolution: Option<String>,
 	bitrate: String
 }
 
@@ -80,6 +80,43 @@ async fn search_results(query: &str) -> Result<Vec<SearchResult>, reqwest::Error
 		.iter().map(|response| response.into()).collect())
 }
 
+fn find_best_format(formats: &Vec<(&AdaptiveFormat, i32)>) -> String {
+	match formats
+		.iter()
+		.max_by(|(_, r1), (_, r2)| r2.cmp(r1)) {
+		Some(f) => f.0.url.clone(),
+		None => String::new()
+	}
+}
+
+fn get_video_url(urls: &Vec<AdaptiveFormat>) -> String {
+	let mut formats: Vec<(&AdaptiveFormat, i32)> = Vec::new();
+
+	for u in urls {
+		if let Some(res) = &u.resolution {
+			if let Ok(r) = res[..res.len()-1].parse::<i32>() {
+				formats.push((u, r))
+			}
+		}
+	}
+
+	find_best_format(&formats)
+}
+
+fn get_audio_url(urls: &Vec<AdaptiveFormat>) -> String {
+	let mut formats: Vec<(&AdaptiveFormat, i32)> = Vec::new();
+
+	for u in urls {
+		if u.codec.starts_with("audio") {
+			if let Ok(b) = u.bitrate.parse::<i32>() {
+				formats.push((u, b))
+			}
+		}
+	}
+
+	find_best_format(&formats)
+}
+
 pub async fn video_info(video_id: String) -> Result<VideoInfo, reqwest::Error> {
 	let response: VideoInfoResponse = reqwest::get(
 		&format!("{}/api/v1/videos/{}", crate::config::INVIDIOUS_URL, video_id)).await?
@@ -88,18 +125,8 @@ pub async fn video_info(video_id: String) -> Result<VideoInfo, reqwest::Error> {
 	Ok(VideoInfo {
 		title: response.title.clone(),
 		thumbnail: response.video_thumbnails[0].url.clone(),
-		video_url: (&response.formats.iter()
-			.filter(|f| f.codec.starts_with("video"))
-			.max_by(|f1, f2|
-				f1.resolution[..f1.resolution.len()-1].parse::<i32>().unwrap()
-					.cmp(&f2.resolution[..f2.resolution.len()-1].parse::<i32>().unwrap()))
-			.unwrap().url).clone(),
-		audio_url: (&response.formats.iter()
-			.filter(|f| f.codec.starts_with("audio"))
-			.max_by(|f1, f2|
-				f1.bitrate.parse::<i32>().unwrap()
-					.cmp(&f2.bitrate.parse::<i32>().unwrap()))
-			.unwrap().url).clone(),
+		video_url: get_video_url(&response.formats),
+		audio_url: get_audio_url(&response.formats),
 		description: response.description.clone()
 	})
 }
