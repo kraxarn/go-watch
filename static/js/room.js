@@ -197,6 +197,8 @@ audio.onplay = () =>
 	video.play().then(_ =>
 		video.currentTime = audio.currentTime)
 
+audio.onpause = () => video.pause()
+
 entry.addEventListener("keypress", event =>
 {
 	if (event.key === "Enter") {
@@ -226,7 +228,6 @@ socket.onmessage = event => {
 			video.src = data.video
 			audio.src = data.audio
 			audio.play()
-			console.log(data)
 			break
 	}
 }
