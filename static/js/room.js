@@ -222,6 +222,7 @@ socket.onmessage = event => {
 			break
 
 		case "video":
+			audio.currentTime = 0
 			video.src = data.video
 			audio.src = data.audio
 			audio.play()
