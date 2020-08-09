@@ -12,4 +12,6 @@ watch online videos together, while keeping your privacy
 ## thanks
 [invidious](https://github.com/omarroth/invidious) for a privacy friendly youtube api.
 
-[sponsor block](https://github.com/ajayyy/SponsorBlock) for blocking sponsors.
+[sponsor block](https://github.com/ajayyy/SponsorBlock) for blocking sponsors ([CC BY-NC-SA 4.0](https://github.com/ajayyy/SponsorBlock/wiki/API-Docs)).
+
+[twemoji](https://github.com/twitter/twemoji) for image assets ([CC BY 4.0](https://github.com/twitter/twemoji/blob/master/LICENSE-GRAPHICS))
