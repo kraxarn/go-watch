@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>go-watch alpha</title>
+    <link rel="stylesheet" type="text/css" href="/watch/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/watch/css/index.css">
+    <link rel="stylesheet" type="text/css" href="/css/global.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="watch-rs">
+</head>
+
+<body>
+
+<div id="container">
+    <h1>Welcome to go-watch (alpha)!</h1>
+    <p id="error">No errors</p>
+    <div id="profile">
+        <img id="avatar" src="{{.currentUser.AvatarPath}}" alt="{{.currentUser.AvatarName}}">
+        <div id="avatarSelect">
+            {{range .avatars}}
+            <div class="avatarOption" onclick="setAvatar({{.Id}})">
+                <img src="/img/avatar/{{printf "%x" .Id}}.svg" alt="{{.Name}}">
+                {{.Name}}
+            </div>
+            {{end}}
+        </div>
+        <span id="username" title="{{.currentUser.Id}}">{{.currentUser.Name}}</span>
+        <div id="nameEntry">
+            <input id="nameInput" type="text" value="{{.current_user.name}}">
+            <div id="saveName" class="button">Save</div>
+        </div>
+    </div>
+    <ul id="panel">
+        <li id="createRoom" class="button">Create New Room </li>
+        <li id="roomEntry">
+            <input id="roomInput" type="text" placeholder="Room Name">
+            <div id="saveRoom" class="button">Save</div>
+        </li>
+        <li class="button"> <a href="browse"> Browse Public Rooms </a> </li>
+        <li class="button"> <a href="rooms"> Your Rooms </a> </li>
+        <li> <br> <a href="api/user/log_out"> Log out / Delete account </a> </li>
+    </ul>
+
+    <h1> About </h1>
+    <p>
+        Welcome to watch-rs, where you can watch YouTube videos with friends
+        together. This website is meant as a more modern, faster,
+        privacy-friendly and open source alternative for other similar
+        sites. Keep in mind that the website is currently under development
+        and some features are missing or may not work correctly yet.
+    </p>
+
+    <h1> Privacy / Account </h1>
+    <p>
+        We never collect any private information, without you providing it
+        manually, for example when changing your name. Your account is
+        automatically created for you and is bound to your current browser.
+        You can change your avatar to any of the preset ones and you can
+        change your name to anything you like. Your account is automatically
+        deleted after one month of inactivity.
+    </p>
+
+    <h1> Open Source </h1>
+    <p>
+        This website is open source and written in Rust.
+        For more information, visit the <a href="https://github.com/kraxarn/watch-rs">GitHub page</a>.
+    </p>
+
+    <h1> Thanks </h1>
+    <p>
+        Special thanks to: <br>
+        <a href="https://github.com/twitter/twemoji">Twemoji for avatars and icons</a>
+    </p>
+</div>
+
+<script src="/js/main.js"></script>
+<script src="/watch/js/main.js"></script>
+<script src="/watch/js/index.js"></script>
+
+</body>
+</html>
