@@ -1,5 +1,6 @@
-# watch-rs
-watch online videos together, while keeping your privacy
+# go-watch
+watch online videos together, while keeping your privacy.
+a separate part of my website, making use of all the website apis.
 
 **currently in very early development, not ready for use just yet**
 
@@ -10,8 +11,6 @@ watch online videos together, while keeping your privacy
 * privacy friendly, no youtube api.
 
 ## thanks
-[invidious](https://github.com/omarroth/invidious) for a privacy friendly youtube api.
-
 [sponsor block](https://github.com/ajayyy/SponsorBlock) for blocking sponsors ([CC BY-NC-SA 4.0](https://github.com/ajayyy/SponsorBlock/wiki/API-Docs)).
 
 [twemoji](https://github.com/twitter/twemoji) for image assets ([CC BY 4.0](https://github.com/twitter/twemoji/blob/master/LICENSE-GRAPHICS))
