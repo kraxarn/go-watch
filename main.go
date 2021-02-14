@@ -2,58 +2,47 @@ package watch
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/kraxarn/website/config"
 	"github.com/kraxarn/website/user"
-	"html/template"
 	"net/http"
 )
 
-type Model struct {
-	CurrentUser *user.User
-	Avatars     []user.Avatar
-	Room        string
+func HtmlFiles() []string {
+	return []string{
+		"watch/html/watch.gohtml",
+		"watch/html/room.gohtml",
+	}
 }
 
-func Route(token *config.Token) error {
+func Route(router *gin.Engine, token *config.Token) {
 	// Main state handler
 	watch := Watch{
 		token: token,
 	}
 
 	// Static files
-	for _, path := range []string{
+	for _, folder := range []string{
 		"css", "img", "js",
 	} {
-		http.Handle(path, http.FileServer(http.Dir(fmt.Sprintf("static/%s", path))))
+		path := fmt.Sprintf("watch/%s", folder)
+		router.Static(path, path)
 	}
 
-	templates, err := template.ParseGlob("../go-watch/html/*.gohtml")
-	if err != nil {
-		return err
-	}
-
-	http.HandleFunc("/watch", func(writer http.ResponseWriter, request *http.Request) {
-		currentUser := watch.getUser(writer, request)
-		err := templates.Lookup("watch.gohtml").Execute(writer, Model{
-			CurrentUser: currentUser,
-			Avatars:     user.AvatarValues,
+	router.GET("/watch", func(context *gin.Context) {
+		currentUser := watch.getUser(context)
+		context.HTML(http.StatusOK, "watch.gohtml", gin.H{
+			"currentUser": currentUser,
+			"avatars":     user.AvatarValues,
 		})
-		if err != nil {
-			fmt.Printf("/watch filed: %v\n", err)
-		}
 	})
 
-	http.HandleFunc("/watch/room/:id", func(writer http.ResponseWriter, request *http.Request) {
-		currentUser := watch.getUser(writer, request)
-		err := templates.Lookup("room.gohtml").Execute(writer, Model{
-			CurrentUser: currentUser,
-			Avatars:     user.AvatarValues,
-			Room:        request.URL.Query().Get("id"),
+	router.GET("/watch/room/:id", func(context *gin.Context) {
+		currentUser := watch.getUser(context)
+		context.HTML(http.StatusOK, "room.gohtml", gin.H{
+			"currentUser": currentUser,
+			"room":        context.Param("id"),
+			"avatars":     user.AvatarValues,
 		})
-		if err != nil {
-			fmt.Printf("/watch/room filed: %v\n", err)
-		}
 	})
-
-	return nil
 }

@@ -1,27 +1,27 @@
 package watch
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/kraxarn/website/config"
 	"github.com/kraxarn/website/user"
-	"net/http"
 )
 
 type Watch struct {
 	token *config.Token
 }
 
-func (watch *Watch) getUser(writer http.ResponseWriter, request *http.Request) *user.User {
+func (watch *Watch) getUser(context *gin.Context) *user.User {
 	var currentUser *user.User
-	cookie, err := request.Cookie("user")
+	token, err := context.Cookie("user")
 	if err == nil {
-		currentUser, err = user.NewUserFromToken(cookie.Value, watch.token)
+		currentUser, err = user.NewUserFromToken(token, watch.token)
 	}
 
 	if currentUser == nil {
 		currentUser = user.NewUser()
 	}
 	if currentUser != nil {
-		currentUser.Refresh(writer, watch.token)
+		currentUser.Refresh(context, watch.token)
 	}
 
 	return currentUser
