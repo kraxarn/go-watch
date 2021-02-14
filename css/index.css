@@ -28,7 +28,7 @@ ul {
 	padding: 8px;
 }
 
-#profile img {
+#profile svg {
 	margin-right: 16px;
 	cursor: pointer;
 	width: 32px;
@@ -80,11 +80,6 @@ ul {
 
 .avatarOption:hover {
 	background-color: rgba(60, 60, 60, 0.8);
-}
-
-.avatarOption img {
-	width: 24px;
-	height: 24px;
 }
 
 #nameEntry, #roomEntry {

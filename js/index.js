@@ -1,6 +1,6 @@
 // Open avatar selection
 getById("avatar").onclick = () => {
-    const avatarSelect = getById("avatarSelect")
+	const avatarSelect = getById("avatarSelect")
 	if (avatarSelect.style.display === "block") {
 		avatarSelect.style.display = "none"
 	} else {
@@ -15,7 +15,7 @@ getById("username").onclick = () => {
 }
 
 getById("saveName").onclick = () => {
-    const username = getById("username")
+	const username = getById("username")
 	username.style.display = "block"
 	getById("nameEntry").style.display = "none"
 	username.textContent = getById("nameInput").value
@@ -47,18 +47,28 @@ getById("saveRoom").onclick = () => {
 }
 
 // Update avatar image
-const setAvatar = name => {
-	getById("avatar").src = `img/${parseInt(name).toString(16)}.svg`
+const setAvatar = (id, name) => {
+	getById("avatar")
+		.querySelector("use")
+		.setAttribute("xlink:href", `/img/avatars.svg#${name}`)
 	getById("avatarSelect").style.display = "none"
 
 	updateUserInfo({
-		avatar: name
+		avatar: parseInt(id)
 	})
+}
+
+getById("avatarSelect").onclick = event => {
+	const target = event.target
+	if (!target.classList.contains("avatarOption")) {
+		return
+	}
+	setAvatar(target.dataset.id, target.dataset.name)
 }
 
 // Update name
 const setName = () => {
-    const nameInput = getById("nameInput")
+	const nameInput = getById("nameInput")
 	if (nameInput.value.length < 3) {
 		return
 	}
