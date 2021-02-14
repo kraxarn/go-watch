@@ -14,7 +14,7 @@ type Model struct {
 	Room        string
 }
 
-func Route(token *config.Token) {
+func Route(token *config.Token) error {
 	// Main state handler
 	watch := Watch{
 		token: token,
@@ -27,10 +27,9 @@ func Route(token *config.Token) {
 		http.Handle(path, http.FileServer(http.Dir(fmt.Sprintf("static/%s", path))))
 	}
 
-	templates, err := template.ParseGlob("html/*.gohtml")
+	templates, err := template.ParseGlob("../go-watch/html/*.gohtml")
 	if err != nil {
-		fmt.Printf("failed to parse templates: %v\n", err)
-		return
+		return err
 	}
 
 	http.HandleFunc("/watch", func(writer http.ResponseWriter, request *http.Request) {
@@ -55,4 +54,6 @@ func Route(token *config.Token) {
 			fmt.Printf("/watch/room filed: %v\n", err)
 		}
 	})
+
+	return nil
 }
