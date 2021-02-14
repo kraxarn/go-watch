@@ -21,8 +21,13 @@ a {
 	user-select: none;
 }
 
-.button:hover {
+.button:hover:not(.notImplemented) {
 	background-color: rgba(207, 216, 220, 0.25);
+}
+
+.button.notImplemented {
+	opacity: 0.6;
+	cursor: auto;
 }
 
 #container {
